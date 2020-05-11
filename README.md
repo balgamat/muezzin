@@ -1,5 +1,5 @@
 # Muezzin 👳🏻‍♂️
-> The final solution for connecting your REST BE to React/Redux FE
+> The final, opinionated, solution to REST API calls based on `redux-saga`
 
 ### Installation
 To install, add `muezzin` npm package and make sure you have it's peer dependencies:
