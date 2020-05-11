@@ -1,0 +1,44 @@
+{
+  "name": "muezzin",
+  "version": "2.0.3",
+  "description": "The final solution for connecting your REST BE to React/Redux FE.",
+  "main": "index.js",
+  "scripts": {
+    "build": "yarn tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balgamat/muezzin.git"
+  },
+  "keywords": [
+    "muezzin",
+    "muezzinjs",
+    "muezzin-js",
+    "API",
+    "API call",
+    "REST",
+    "redux",
+    "redux-saga",
+    "data",
+    "get",
+    "post",
+    "patch",
+    "delete",
+    "opinionated"
+  ],
+  "author": "Matěj Balga",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/balgamat/muezzin/issues"
+  },
+  "homepage": "https://github.com/balgamat/muezzin#readme",
+  "devDependencies": {
+    "@types/styled-components": "^5.1.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+  }
+}
