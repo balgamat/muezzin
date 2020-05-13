@@ -1,6 +1,10 @@
 import { Action, APIResult } from "../types";
 
-export const Success = (params: APIResult): Action<APIResult> => ( {
+export interface SuccessAC {
+  (params: APIResult): Action<APIResult>
+}
+
+export const Success: SuccessAC = params => ( {
   type: `@api/${params.origin}/SUCCESS`,
   payload: params,
 } );

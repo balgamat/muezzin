@@ -1,22 +1,25 @@
 import { Action, APICall } from "../types";
-import { all, call, put, select } from "redux-saga/effects";
-import * as R from "ramda";
 import isCallable from "is-callable";
-import { Success } from "../actions/success";
-import { endLoading } from "../loading";
+import { all, call, put, select } from "redux-saga/effects";
+import { API } from "../withAPI";
+import { endLoading, startLoading } from "../actions/loading";
 import { Error } from "../actions/error";
+import { path } from "ramda";
+import { Success } from "../actions/success";
 
 export function* handleCall(action: Action<APICall>) {
   const origin = action.type.slice(5);
+  yield put(startLoading({ origin }));
+
   const state = yield select();
   const {
     payload: {
       callParams,
       endpoint: endpoint,
-      errorSelector,
+      errorReducer,
       postActions,
       preActions,
-      selector
+      reducer
     }
   } = action;
 
@@ -25,14 +28,9 @@ export function* handleCall(action: Action<APICall>) {
       yield all(preActions(state));
     }
 
-    const data = yield call(
-      // @ts-ignore
-      R.path(endpoint, API),
-      // @ts-ignore
-      {
-        params: isCallable(callParams) ? callParams(state) : callParams
-      }
-    );
+    const data = yield call(path(endpoint, API) as any, {
+      params: isCallable(callParams) ? callParams(state) : callParams
+    });
 
     if (data.ok) {
       yield all([
@@ -40,10 +38,10 @@ export function* handleCall(action: Action<APICall>) {
           Success({
             data: data.body,
             origin,
-            selector
+            reducer: reducer
           })
         ),
-        put(endLoading())
+        put(endLoading({ origin }))
       ]);
 
       if (postActions) {
@@ -55,10 +53,10 @@ export function* handleCall(action: Action<APICall>) {
           Error({
             data,
             origin,
-            selector: errorSelector
+            reducer: errorReducer
           })
         ),
-        put(endLoading())
+        put(endLoading({ origin }))
       ]);
     }
   } catch (e) {
@@ -67,13 +65,13 @@ export function* handleCall(action: Action<APICall>) {
         Error({
           data: e,
           origin,
-          selector: errorSelector
+          reducer: errorReducer
         })
       ),
-      put(endLoading())
+      put(endLoading({ origin }))
     ]);
 
-    if (!errorSelector) {
+    if (!errorReducer) {
       console.error(
         "Error occurred. Please add errorSelector if you wish to handle it within your state."
       );

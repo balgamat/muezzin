@@ -1,9 +1,16 @@
 import { PutEffect, CallEffect } from "redux-saga/effects";
+import { SuccessAC } from "./actions/success";
+import { ClearErrorsAC, ErrorAC } from "./actions/error";
+import { EndLoadingAC, StartLoadingAC } from "./actions/loading";
 
 export type Action<T, S = string> = {
   type: S;
   payload: T;
 };
+
+export type APIAction = ReturnType<
+  SuccessAC | ErrorAC | StartLoadingAC | EndLoadingAC | ClearErrorsAC
+>;
 
 export interface BatchCall {
   calls: Action<APICall>[];
@@ -20,16 +27,16 @@ export interface APICall {
   behavior?: CallBehavior;
   callParams: ((state: any) => object) | object;
   endpoint: string[];
-  errorSelector?: (data: any, state?: any) => object;
+  errorReducer?: (data: any, state?: any) => object;
   postActions?: (apiCallResult: any) => Array<PutEffect | CallEffect>;
   preActions?: (state: object) => Array<PutEffect | CallEffect>;
-  selector?: (data: any, state?: any) => object;
+  reducer?: (data: any, state?: any) => object;
 }
 
 export interface APIResult {
   origin: string;
   data: object;
-  selector?: (data: any, state?: any) => object;
+  reducer?: (data: any, state?: any) => object;
 }
 
 export interface Endpoint<T> {
@@ -70,3 +77,10 @@ export type APIDefinition =
   | Level7
   | Level8
   | Level9;
+
+export type APIState = Record<string, any> & {
+  api: {
+    loading: Record<string, null>;
+    errors: Record<string, any[]>;
+  };
+};
