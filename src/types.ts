@@ -36,7 +36,7 @@ export interface APICall {
 
 export interface APIResult {
   origin: string;
-  data: object;
+  data?: object;
   reducer?: (data: any, state?: any) => object;
 }
 
