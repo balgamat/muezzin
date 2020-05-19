@@ -5,7 +5,7 @@ import { Action, APICall, CallBehavior } from "../types";
 import { handleCall } from "./handleCall";
 
 const shouldTakeEvery: any = (a: Action<APICall>) =>
-  (a.payload?.behavior === CallBehavior.TakeEvery || !!a.payload?.behavior) &&
+  ( a.payload?.behavior === CallBehavior.TakeEvery || !!a.payload?.behavior ) &&
   new RegExp("@API/").test(a.type);
 
 const shouldTakeLatest: any = (a: Action<APICall>) =>

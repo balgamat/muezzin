@@ -15,7 +15,8 @@ export function* handleCall(action: Action<APICall>) {
   const {
     payload: {
       callParams,
-      endpoint: endpoint,
+      endpoint,
+      errorActions,
       errorReducer,
       postActions,
       preActions,
@@ -28,36 +29,24 @@ export function* handleCall(action: Action<APICall>) {
       yield all(preActions(state));
     }
 
-    const data = yield call(path(endpoint, API) as any, {
+    // @ts-ignore
+    const data = yield call(path(endpoint, API), {
       params: isCallable(callParams) ? callParams(state) : callParams
     });
 
-    if (data.ok) {
-      yield all([
-        put(
-          Success({
-            data: data.body,
-            origin,
-            reducer: reducer
-          })
-        ),
-        put(endLoading({ origin }))
-      ]);
+    yield all([
+      put(
+        Success({
+          data,
+          origin,
+          reducer: reducer
+        })
+      ),
+      put(endLoading({ origin }))
+    ]);
 
-      if (postActions) {
-        yield all(postActions(data.body));
-      }
-    } else {
-      yield all([
-        put(
-          Error({
-            data,
-            origin,
-            reducer: errorReducer
-          })
-        ),
-        put(endLoading({ origin }))
-      ]);
+    if (postActions) {
+      yield all(postActions(data.body));
     }
   } catch (e) {
     yield all([
@@ -71,10 +60,8 @@ export function* handleCall(action: Action<APICall>) {
       put(endLoading({ origin }))
     ]);
 
-    if (!errorReducer) {
-      console.error(
-        "Error occurred. Please add errorSelector if you wish to handle it within your state."
-      );
+    if (errorActions) {
+      yield all(errorActions(e));
     }
   }
 }

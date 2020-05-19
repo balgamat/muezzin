@@ -18,15 +18,16 @@ export interface BatchCall {
 }
 
 export enum CallBehavior {
-  TakeEvery,
-  TakeLatest,
-  TakeFirst
+  TakeEvery = "takeEvery",
+  TakeLatest = "takeLatest",
+  TakeFirst = "takeFirst"
 }
 
 export interface APICall {
   behavior?: CallBehavior;
-  callParams: ((state: any) => object) | object;
+  callParams?: ((state: any) => object) | object;
   endpoint: string[];
+  errorActions?: (apiCallResult: any) => Array<PutEffect | CallEffect>;
   errorReducer?: (data: any, state?: any) => object;
   postActions?: (apiCallResult: any) => Array<PutEffect | CallEffect>;
   preActions?: (state: object) => Array<PutEffect | CallEffect>;
@@ -39,8 +40,8 @@ export interface APIResult {
   reducer?: (data: any, state?: any) => object;
 }
 
-export interface Endpoint<T> {
-  (params?: T): Promise<any>;
+export interface Endpoint<T, R = any> {
+  (params?: T): R;
 }
 
 type Level0 = Record<string, Endpoint<any>>;

@@ -24,8 +24,12 @@ export const initialState: APIState = {
   }
 };
 
+export const apiReducer = (state?: APIState) => state || initialState;
+export const defineAPI = (definition: APIDefinition) => (API = definition);
+export const getAPI = () => API;
+
 export const withAPI = (definition: APIDefinition) => {
-  API = definition;
+  defineAPI(definition);
 
   return (rootReducer: Reducer) => (
     state: APIState = initialState,
@@ -106,6 +110,6 @@ export const withAPI = (definition: APIDefinition) => {
       });
     }
 
-    return { api: state.api, ...rootReducer(state, action) };
+    return { ...rootReducer(state, action), api: state.api };
   };
 };
