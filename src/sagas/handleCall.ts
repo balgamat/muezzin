@@ -1,8 +1,10 @@
+import fetch from "cross-fetch";
 import { Action, APICall } from "../types";
 import { all, call, put, select } from "redux-saga/effects";
 import { endLoading, startLoading } from "../actions/loading";
 import { Error } from "../actions/error";
 import { Success } from "../actions/success";
+import { handleError } from "./handleError";
 
 export function* handleCall(action: Action<APICall>) {
   const origin = action.payload.name;
@@ -20,27 +22,12 @@ export function* handleCall(action: Action<APICall>) {
     }
   } = action;
 
-  const onError = function*(errorData: any) {
-    yield all([
-      put(
-        Error({
-          data: errorData,
-          origin,
-          reducer: errorReducer
-        })
-      ),
-      put(endLoading({ origin }))
-    ]);
-
-    if (errorActions) {
-      yield all(errorActions(errorData));
-    }
-  };
-
   try {
     if (preActions) {
       yield all(
-        typeof preActions === "function" ? preActions(yield select()) : preActions
+        typeof preActions === "function"
+          ? preActions(yield select())
+          : preActions
       );
     }
 
@@ -66,13 +53,25 @@ export function* handleCall(action: Action<APICall>) {
 
       if (postActions) {
         yield all(
-          typeof postActions === "function" ? postActions(data, yield select()) : postActions
+          typeof postActions === "function"
+            ? postActions(data, yield select())
+            : postActions
         );
       }
     } else {
-      yield onError(data);
+      yield call(handleError, {
+        errorData: data,
+        errorActions,
+        errorReducer,
+        origin
+      });
     }
   } catch (e) {
-    yield onError(e);
+    yield call(handleError, {
+      errorData: e,
+      errorActions,
+      errorReducer,
+      origin
+    });
   }
 }
