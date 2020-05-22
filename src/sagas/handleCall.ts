@@ -2,7 +2,6 @@ import fetch from "cross-fetch";
 import { Action, APICall } from "../types";
 import { all, call, put, select } from "redux-saga/effects";
 import { endLoading, startLoading } from "../actions/loading";
-import { Error } from "../actions/error";
 import { Success } from "../actions/success";
 import { handleError } from "./handleError";
 
