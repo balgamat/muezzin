@@ -9,7 +9,9 @@ export function* handleBatch({
 }: Action<BatchCall>) {
   yield all(calls.map(action => call(handleCall, action)));
   if (onFinished) {
-    yield all(onFinished(yield select()));
+    yield all(
+      typeof onFinished === "function" ? onFinished(yield select()) : onFinished
+    );
   }
   yield put(batchFinished());
 }
