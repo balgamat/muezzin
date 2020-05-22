@@ -1,5 +1,3 @@
-import fetch from "cross-fetch";
-import isCallable from "is-callable";
 import { Action, APICall } from "../types";
 import { all, call, put, select } from "redux-saga/effects";
 import { endLoading, startLoading } from "../actions/loading";
@@ -10,7 +8,6 @@ export function* handleCall(action: Action<APICall>) {
   const origin = action.payload.name;
   yield put(startLoading({ origin }));
 
-  const state = yield select();
   const {
     payload: {
       errorActions,
@@ -43,7 +40,7 @@ export function* handleCall(action: Action<APICall>) {
   try {
     if (preActions) {
       yield all(
-        typeof preActions === "function" ? preActions(state) : preActions
+        typeof preActions === "function" ? preActions(yield select()) : preActions
       );
     }
 
@@ -51,7 +48,7 @@ export function* handleCall(action: Action<APICall>) {
     const response = yield call(
       fetch,
       url,
-      typeof params === "function" ? params(state) : params
+      typeof params === "function" ? params(yield select()) : params
     );
     const data = yield response.json();
 
@@ -69,7 +66,7 @@ export function* handleCall(action: Action<APICall>) {
 
       if (postActions) {
         yield all(
-          typeof postActions === "function" ? postActions(data) : postActions
+          typeof postActions === "function" ? postActions(data, yield select()) : postActions
         );
       }
     } else {

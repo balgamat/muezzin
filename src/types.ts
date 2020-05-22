@@ -28,9 +28,9 @@ export interface APICall {
   errorActions?: (apiCallResult: any) => Array<PutEffect | CallEffect>;
   errorReducer?: (data: any, state?: any) => object;
   name: string;
-  params?: ((state: any) => object) | object;
+  params?: ((state: any) => RequestInit) | RequestInit;
   postActions?:
-    | ((data: any) => Array<PutEffect | CallEffect>)
+    | ((data: any, state: any) => Array<PutEffect | CallEffect>)
     | Array<PutEffect | CallEffect>;
   preActions?:
     | ((state: object) => Array<PutEffect | CallEffect>)

@@ -2,10 +2,9 @@
   "name": "muezzin",
   "version": "0.1.0",
   "description": "The final, opinionated, solution to REST API calls based on `redux-saga`",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "yarn tsc",
-    "clean": "rm -rf ./",
     "test": "jest",
     "test:watch": "yarn test -- --watch"
   },
@@ -36,7 +35,6 @@
   },
   "homepage": "https://github.com/balgamat/muezzin#readme",
   "devDependencies": {
-    "@types/is-callable": "^1.1.0",
     "@types/jest": "^25.2.3",
     "@types/node": "^13.13.5",
     "@types/ramda": "^0.27.4",
@@ -47,7 +45,6 @@
   },
   "dependencies": {
     "cross-fetch": "^3.0.4",
-    "is-callable": "^1.1.5",
     "ramda": "^0.27.0"
   },
   "peerDependencies": {
