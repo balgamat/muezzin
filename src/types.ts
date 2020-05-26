@@ -13,7 +13,7 @@ export type APIAction = ReturnType<
 >;
 
 export interface BatchCall {
-  calls: Action<APICall>[];
+  requests: Action<APICall>[];
   onFinished?: APICall["preActions"];
 }
 
@@ -25,7 +25,9 @@ export enum CallBehavior {
 
 export interface APICall {
   behavior?: CallBehavior;
-  errorActions?: (apiCallResult: any) => Array<PutEffect | CallEffect>;
+  errorActions?:
+    | ((error: any, state: any) => Array<PutEffect | CallEffect>)
+    | Array<PutEffect | CallEffect>;
   errorReducer?: (data: any, state?: any) => object;
   name: string;
   params?: ((state: any) => RequestInit) | RequestInit;

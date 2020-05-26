@@ -1,4 +1,4 @@
-import { all, put } from "redux-saga/effects";
+import { all, put, select } from "redux-saga/effects";
 import { Error } from "../actions/error";
 import { endLoading } from "../actions/loading";
 import { APICall } from "../types";
@@ -23,6 +23,10 @@ export function* handleError(
   ]);
 
   if (errorActions) {
-    yield all(errorActions(errorData));
+    yield all(
+      typeof errorActions === "function"
+        ? errorActions(errorData, yield select())
+        : errorActions
+    );
   }
 }

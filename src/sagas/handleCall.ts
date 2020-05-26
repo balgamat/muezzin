@@ -4,6 +4,7 @@ import { all, call, put, select } from "redux-saga/effects";
 import { endLoading, startLoading } from "../actions/loading";
 import { Success } from "../actions/success";
 import { handleError } from "./handleError";
+import { defaultHeaders } from "../headers";
 
 export function* handleCall(action: Action<APICall>) {
   const origin = action.payload.name;
@@ -30,12 +31,15 @@ export function* handleCall(action: Action<APICall>) {
       );
     }
 
+    const { headers = defaultHeaders, method = "GET", ...req }: any =
+      (typeof params === "function" ? params(yield select()) : params) || {};
+
     // @ts-ignore
-    const response = yield call(
-      fetch,
-      url,
-      typeof params === "function" ? params(yield select()) : params
-    );
+    const response = yield call(fetch, url, {
+      ...req,
+      method,
+      headers
+    });
     const data = yield response.json();
 
     if (response.ok) {

@@ -36,7 +36,11 @@ describe("Saga: handleCall", () => {
   it("should call API", () => {
     expect(gen.next().value).toEqual(
       // @ts-ignore
-      call(fetch, action.payload.url, action.payload.params)
+      call(fetch, action.payload.url, {
+        ...action.payload.params,
+        headers: {},
+        method: "GET"
+      })
     );
   });
 
@@ -49,12 +53,14 @@ describe("Saga: handleCall", () => {
     expect(
       failGen.next(val).value
       // @ts-ignore
-    ).toEqual(call(handleError, {
-      errorData: errorResponse,
-      errorActions: action.payload.errorActions,
-      errorReducer: action.payload.errorReducer,
-      origin
-    }));
+    ).toEqual(
+      call(handleError, {
+        errorData: errorResponse,
+        errorActions: action.payload.errorActions,
+        errorReducer: action.payload.errorReducer,
+        origin
+      })
+    );
   });
 
   it("should get json data", () => {

@@ -3,17 +3,17 @@ import React, {
   ComponentType,
   ReactNode,
   ReactChildren,
-  FC, ReactElement
+  FC,
+  ReactElement
 } from "react";
 import { useSelector } from "react-redux";
 import { isLoading } from "..";
 
-export const withLoading = (
-  loadingComponent: ReactElement,
+export const withLoading = (spinner: ReactElement) => (
   ...waitFor: string[]
 ) => (Component: ComponentType): FC => props =>
   useSelector(isLoading(...waitFor)) ? (
-    loadingComponent
+    spinner
   ) : (
     <Component {...props}>{props.children as ReactChildren}</Component>
   );

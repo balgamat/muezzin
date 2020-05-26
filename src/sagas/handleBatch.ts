@@ -5,9 +5,9 @@ import { batchFinished } from "../actions/batchFinished";
 import { handleCall } from "./handleCall";
 
 export function* handleBatch({
-  payload: { calls, onFinished }
+  payload: { requests, onFinished }
 }: Action<BatchCall>) {
-  yield all(calls.map(action => call(handleCall, action)));
+  yield all(requests.map(action => call(handleCall, action)));
   if (onFinished) {
     yield all(
       typeof onFinished === "function" ? onFinished(yield select()) : onFinished
