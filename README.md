@@ -207,7 +207,7 @@ I guess it's high time I explained everything you can and cannot do with it, eh?
 | `reducer?`      | How state should be altered on success.                                                                                                                                                                                                                                       | _(result: any, state: T) => T_                                                                 |                                              | `(data, state) => {...state, user: data }`                 |
 | `url`           | Request URL                                                                                                                                                                                                                                                                   | _string_                                                                                       |                                              | `https://backend.net/api/me`                               |
 
-## Loading & errors
+## 💈 Loading
 
 Remember the 'friendly name' you had to assign to each of your requests? Now's the time we'll see it in actions. Turns
 out, there was a lot happening behind the scenes:
@@ -218,11 +218,11 @@ out, there was a lot happening behind the scenes:
 2. When the request ends, regardless of whether it succeeded or not, `loadingEnd` is fired and state updates again.
 
 3. When an error occurs, it is stored in a list of errors that happened on this particular request. The errors then keep
-   piling up there until you are ready to deal with them and after that, you clear them.
+   piling up there until you are ready to deal with them and after that, you clear them. (more in the next chapter)
 
 You don't have to know all this, however. Muezzin has some tools ready to assist you with your components rightaway:
 
-#### `isLoading`
+### `isLoading`
 
 Whenever you need to wait for something, show a loading indicator or just know if something is happening, you can use
 `isLoading` selector. Just enter the names of all the requests that you want to wait for and it returns true or false.
@@ -268,7 +268,10 @@ const Dashboard = withLoading(<Spinner/>)("profile", "rankings", "score")(Conten
 return <Dashboard someProp={1} /> // Spinner gets displayed if something is pending...
 ```
 
-#### `getErrors`
+## 💔 Errors
+When an error occurs, it is stored in a list of errors that happened on this particular request. The errors then keep piling up there until you are ready to deal with them and after that, you clear them.
+
+### `getErrors`
 
 In a similar manner, you can get errors for your endpoints. These get returned as an object, that contains list of errors under the keys of requests' names. (e.g. `{ profile: ['Could not fetch profile'], score: ['Invalid request']}` )
 
@@ -292,7 +295,7 @@ const Homepage = () => {
 };
 ```
 
-#### `clearErrors`
+### `clearErrors`
 
 Once you deal with an error, you should clear it. This is done by dispatching a clearError action:
 
@@ -301,29 +304,57 @@ import { clearErrors, ClearErrorBehavior } from "muezzin";
 ...
 
 <Button
-  onClick={() => dispatch(clearErrors({atOrigin: 'profile', behavior: ClearErrorBehavior.ClearFirst }))} 
+  onClick={() => dispatch(clearErrors({atOrigin: 'profile', behavior: ClearErrorBehavior.ClearFirst }))}
 />
 ```
 
 Depending on how thorough you want to be, you can either clean all errors everywhere:
+
 ```typescript
-clearErrors()
+clearErrors();
 ```
+
 clear all errors for some request
+
 ```typescript
-clearErrors({atOrigin: 'profile'})
+clearErrors({ atOrigin: "profile" });
 ```
+
 or clear them one by one as you go, either in the LIFO or FIFO manner, depending on the behavior parameter set:
+
 ```typescript
-clearErrors({atOrigin: 'profile', behavior: ClearErrorBehavior.ClearFirst }) // FIFO
+clearErrors({ atOrigin: "profile", behavior: ClearErrorBehavior.ClearFirst }); // FIFO
 ```
+
 for FIFO error handling or
+
 ```typescript
-clearErrors({atOrigin: 'profile', behavior: ClearErrorBehavior.ClearLast }) // LIFO
+clearErrors({ atOrigin: "profile", behavior: ClearErrorBehavior.ClearLast }); // LIFO
 ```
+
 to clear the last error first. There's also `ClearErrorBehavior.ClearAll` for completeness, but this behavior is default so you don't have to set it explicitly.
 
+### Default error interceptors
+If you have some sort of error handling in place already, you might find _default error interceptors_ useful. It might come handy also in cases where you need to revoke or renew token once your backend has
+returned an error that it expired. These interceptors are ran on each error, so it might be a good idea to put a condition in place, that will select just the cases where you need them.
+
+Similar to `errorActions`, as described above in the table, you have `setDefaultErrorInterceptors` (and `getDefaultErrorInterceptors` respectively) that add these to all `api()` actions' `errorActions` as if you had defined them on each call separately.
+
+```typescript
+import { setDefaultErrorInterceptors } from "muezzin";
+import {call, put } from "@redux-saga/core/effects";
+
+const myErrorHandler = function* (error: any, state: any) {
+  if (error === 'TOKEN_REVOKED' && state.loggedIn) {
+    put(renewToken()); // Dispatches an action that will try to get a new token
+  }
+}
+
+setDefaultErrorInterceptors((error, state) => [call(myErrorHandler, error, state)]);
+```
+
 ## 🚌 Batches
+
 Sometimes, it's necessary to synchronize multiple API calls. You can do this either by chaining the requests in `postActions` or, more elegantly, employing the power of `batchCall`. Batch call takes a list of your `api` actions
 and an `onFinished` parameter, that specifies what to do next.
 
@@ -344,4 +375,46 @@ dispatch(getBFFs());
 
 Once all of the actions from `requests` array are finished, the batch saga dispatches all of the actions and calls all of the functions in onFinished. Performing a batch is also marked in Redux by `batchStarted` and `batchFinished` actions being dispatched at the start or at the end of the batch respectively.
 
+## 👤 Headers
 
+You can either set headers for each one and every request or you can set a set of default ones that will be added to every request without you setting them explicitly. For this you can use
+these utility functions:
+
+#### `setDefaultHeaders`
+
+This sets all default headers at once. If there were some default headers set before, this overwrites them.
+
+```typescript
+import { setDefaultHeaders } from "muezzin";
+
+setDefaultHeaders({
+  "Content-Type": "application/json",
+  Accept: "*"
+});
+```
+
+#### `addDefaultHeaderKey`
+
+Adds a new key-value pair to the `defaultHeaders` object. This might be useful e.g. for Auth:
+
+```typescript
+import { addDefaultHeaderKey } from "muezzin";
+
+addDefaultHeaderKey("Authorization", `Bearer ${token}`);
+```
+
+#### `clearDefaultHeaderKey`
+
+Removes a key-value pair from the `defaultHeaders` object. This might be useful e.g. after logout:
+
+```typescript
+import { clearDefaultHeaderKey } from "muezzin";
+
+clearDefaultHeaderKey("Authorization");
+```
+
+#### `getDefaultHeaders`
+Returns the current state of the `defaultHeaders` object.
+
+**NOTE: If you set your own headers in the `api()` action creator, these are used instead of
+the `defaultHeaders`. If you want to include these, add them using `getDefaultHeaders()`**

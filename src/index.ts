@@ -1,15 +1,20 @@
 import { api } from "./api";
-import { withAPI, apiReducer } from "./withAPI";
-import { clearErrors, ClearErrorBehavior } from "./actions/error";
-import { watchAPI } from "./sagas/watchAPI";
-import { isLoading } from "./selectors/isLoading";
-import { getErrors } from "./selectors/getErrors";
 import { CallBehavior } from "./types";
+import { clearErrors, ClearErrorBehavior } from "./actions/error";
+import { getErrors } from "./selectors/getErrors";
+import { isLoading } from "./selectors/isLoading";
+import { watchAPI } from "./sagas/watchAPI";
+import { withAPI, apiReducer } from "./withAPI";
 import {
-  setDefaultHeaders,
   addDefaultHeaderKey,
-  clearDefaultHeaderKey
+  clearDefaultHeaderKey,
+  getDefaultHeaders,
+  setDefaultHeaders,
 } from "./headers";
+import {
+  getDefaultErrorInterceptors,
+  setDefaultErrorInterceptors,
+} from "./errors";
 
 export {
   addDefaultHeaderKey,
@@ -19,8 +24,11 @@ export {
   clearDefaultHeaderKey,
   ClearErrorBehavior,
   clearErrors,
+  getDefaultErrorInterceptors,
+  getDefaultHeaders,
   getErrors,
   isLoading,
+  setDefaultErrorInterceptors,
   setDefaultHeaders,
   watchAPI,
   withAPI

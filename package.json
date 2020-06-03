@@ -6,7 +6,8 @@
   "scripts": {
     "build": "yarn tsc",
     "test": "jest",
-    "test:watch": "yarn test -- --watch"
+    "test:watch": "yarn test -- --watch",
+    "publish": "npm version patch -f"
   },
   "repository": {
     "type": "git",

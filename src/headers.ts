@@ -1,5 +1,7 @@
 export let defaultHeaders: Record<string, any> = {};
 
+export const getDefaultHeaders = () => defaultHeaders;
+
 export const setDefaultHeaders = (headers: HeadersInit) => {
   defaultHeaders = headers;
 };
