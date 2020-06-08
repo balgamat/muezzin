@@ -15,7 +15,7 @@ export function* handleError(
   yield all([
     put(
       Error({
-        data: errorData,
+        response: errorData,
         origin,
         reducer: errorReducer
       })

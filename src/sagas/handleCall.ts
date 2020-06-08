@@ -1,4 +1,4 @@
-import fetch from "cross-fetch";
+import axios from "axios";
 import { Action, APICall } from "../types";
 import { all, call, put, select } from "redux-saga/effects";
 import { endLoading, startLoading } from "../actions/loading";
@@ -34,44 +34,35 @@ export function* handleCall(action: Action<APICall>) {
     const { headers = defaultHeaders, method = "GET", ...req }: any =
       (typeof params === "function" ? params(yield select()) : params) || {};
 
-    // @ts-ignore
-    const response = yield call(fetch, url, {
+    const response = yield call(axios, url, {
       ...req,
       method,
       headers
     });
-    const data = yield response.json();
 
-    if (response.ok) {
-      yield all([
-        put(
-          Success({
-            data,
-            origin,
-            reducer: reducer
-          })
-        ),
-        put(endLoading({ origin }))
-      ]);
+    yield all([
+      put(
+        Success({
+          response,
+          origin,
+          reducer: reducer
+        })
+      ),
+      put(endLoading({ origin }))
+    ]);
 
-      if (postActions) {
-        yield all(
-          typeof postActions === "function"
-            ? postActions(data, yield select())
-            : postActions
-        );
-      }
-    } else {
-      yield call(handleError, {
-        errorData: data,
-        errorActions,
-        errorReducer,
-        origin
-      });
+    if (postActions) {
+      yield all(
+        typeof postActions === "function"
+          ? postActions(response, yield select())
+          : postActions
+      );
     }
   } catch (e) {
+    const errorData = e.response || e.request || e.message;
+
     yield call(handleError, {
-      errorData: e,
+      errorData,
       errorActions,
       errorReducer,
       origin

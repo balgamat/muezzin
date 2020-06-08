@@ -33,17 +33,17 @@ export const withAPI = (rootReducer: Reducer) => (
     (action.type.endsWith("/SUCCESS") || action.type.endsWith("/ERROR"))
   ) {
     const {
-      payload: { data, origin, reducer }
+      payload: { response, origin, reducer }
     } = action as Action<APIResult>;
 
     const stateWithErrors = action.type.endsWith("/ERROR")
-      ? over(lensPath(["api", "errors", origin]), append(data), state)
+      ? over(lensPath(["api", "errors", origin]), append(response), state)
       : state;
 
     return reducer
       ? {
           ...stateWithErrors,
-          ...reducer(data, stateWithErrors)
+          ...reducer(response, stateWithErrors)
         }
       : stateWithErrors;
   }

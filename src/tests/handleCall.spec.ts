@@ -1,4 +1,4 @@
-import fetch from "cross-fetch";
+import axios from "axios";
 import { handleCall } from "../sagas/handleCall";
 import { api } from "../api";
 import { call, put, all } from "redux-saga/effects";
@@ -10,7 +10,7 @@ import { handleError } from "../sagas/handleError";
 
 describe("Saga: handleCall", () => {
   const successResponse = { data: "Test Passed" };
-  const errorResponse = { data: "Error" };
+  const errorResponse = { response: { data: "Error" } };
   const preAction = { type: "preActionTest" };
   const postAction = { type: "postActionTest" };
   const action = api({
@@ -19,7 +19,7 @@ describe("Saga: handleCall", () => {
     preActions: [put(preAction)],
     postActions: [put(postAction)],
     params: {
-      body: JSON.stringify({ data: "Test data" })
+      data: { data: "Test data" }
     }
   });
   const origin = "saga/test";
@@ -33,10 +33,24 @@ describe("Saga: handleCall", () => {
     expect(gen.next().value).toEqual(all([put(preAction)]));
   });
 
+  it("should fail on error", () => {
+    const throwGen = gen.clone();
+    // @ts-ignore
+    expect(throwGen.throw(errorResponse).value).toEqual(
+      // @ts-ignore
+      call(handleError, {
+        errorData: errorResponse.response,
+        errorActions: action.payload.errorActions,
+        errorReducer: action.payload.errorReducer,
+        origin
+      })
+    );
+  });
+
   it("should call API", () => {
     expect(gen.next().value).toEqual(
       // @ts-ignore
-      call(fetch, action.payload.url, {
+      call(axios, action.payload.url, {
         ...action.payload.params,
         headers: {},
         method: "GET"
@@ -44,52 +58,10 @@ describe("Saga: handleCall", () => {
     );
   });
 
-  it("should fail when response not ok", () => {
-    const failGen = gen.clone();
-    const val = failGen.next({
-      ok: false,
-      json: () => errorResponse
-    }).value;
-    expect(
-      failGen.next(val).value
-      // @ts-ignore
-    ).toEqual(
-      call(handleError, {
-        errorData: errorResponse,
-        errorActions: action.payload.errorActions,
-        errorReducer: action.payload.errorReducer,
-        origin
-      })
-    );
-  });
-
-  it("should get json data", () => {
-    expect(
-      gen.next({
-        ok: true,
-        json: () => successResponse
-      }).value
-    ).toEqual(successResponse);
-  });
-
-  it("should fail on error", () => {
-    const throwGen = gen.clone();
-    // @ts-ignore
-    expect(throwGen.throw(errorResponse).value).toEqual(
-      // @ts-ignore
-      call(handleError, {
-        errorData: errorResponse,
-        errorActions: action.payload.errorActions,
-        errorReducer: action.payload.errorReducer,
-        origin
-      })
-    );
-  });
-
   it("should call success with received data", () => {
     expect(gen.next(successResponse).value).toEqual(
       all([
-        put(Success({ data: successResponse, origin, reducer: undefined })),
+        put(Success({ response: successResponse, origin, reducer: undefined })),
         put(endLoading({ origin }))
       ])
     );

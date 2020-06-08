@@ -2,6 +2,7 @@ import { PutEffect, CallEffect } from "redux-saga/effects";
 import { SuccessAC } from "./actions/success";
 import { ClearErrorsAC, ErrorAC } from "./actions/error";
 import { EndLoadingAC, StartLoadingAC } from "./actions/loading";
+import { AxiosRequestConfig } from "axios";
 
 export type Action<T, S = string> = {
   type: S;
@@ -30,7 +31,7 @@ export interface APICall {
     | Array<PutEffect | CallEffect>;
   errorReducer?: (data: any, state?: any) => object;
   name: string;
-  params?: ((state: any) => RequestInit) | RequestInit;
+  params?: ((state: any) => AxiosRequestConfig) | AxiosRequestConfig;
   postActions?:
     | ((data: any, state: any) => Array<PutEffect | CallEffect>)
     | Array<PutEffect | CallEffect>;
@@ -42,7 +43,7 @@ export interface APICall {
 }
 
 export interface APIResult {
-  data?: object;
+  response?: object;
   origin: string;
   reducer?: (data: any, state?: any) => object;
 }
