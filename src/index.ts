@@ -15,6 +15,7 @@ import {
   getDefaultErrorInterceptors,
   setDefaultErrorInterceptors,
 } from "./errors";
+import { setupAxios } from "./axios";
 
 export {
   addDefaultHeaderKey,
@@ -30,6 +31,7 @@ export {
   isLoading,
   setDefaultErrorInterceptors,
   setDefaultHeaders,
+  setupAxios,
   watchAPI,
   withAPI
 };

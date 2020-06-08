@@ -418,3 +418,17 @@ Returns the current state of the `defaultHeaders` object.
 
 **NOTE: If you set your own headers in the `api()` action creator, these are used instead of
 the `defaultHeaders`. If you want to include these, add them using `getDefaultHeaders()`**
+
+## Axios
+
+The underlying package to make the calls is `axios`. You can get access to the `axios` object through the `setupAxios` function and then set up additional parameters like base URL, default headers, interceptors, etc.
+
+```typescript
+import { setupAxios } from "muezzin";
+
+setupAxios(axios => {
+  axios.defaults.baseURL = 'https://api.example.com';
+  axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+  axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+})
+```

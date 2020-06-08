@@ -1,10 +1,10 @@
-import axios from "axios";
 import { Action, APICall } from "../types";
 import { all, call, put, select } from "redux-saga/effects";
 import { endLoading, startLoading } from "../actions/loading";
 import { Success } from "../actions/success";
 import { handleError } from "./handleError";
 import { defaultHeaders } from "../headers";
+import { axios } from "../axios";
 
 export function* handleCall(action: Action<APICall>) {
   const origin = action.payload.name;
