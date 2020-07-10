@@ -432,3 +432,17 @@ setupAxios(axios => {
   axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 })
 ```
+
+## Typescript
+
+If you are using Typescript, you should also augment the provided `AppState` interface with the type of your respective state.
+Let's say your state contains two keys: `items` of type `string[]` and `users` of type `object[]`, then to have your `api()` function parameters correctly typed, you place this code somewhere high enough (e.g. where you configure your store):
+
+```typescript
+declare module 'muezzin' {
+  interface AppState {
+    a: string;
+    b: number;
+  }
+}
+```

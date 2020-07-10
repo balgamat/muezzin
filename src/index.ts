@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { CallBehavior } from "./types";
+import { CallBehavior, AppState } from "./types";
 import { clearErrors, ClearErrorBehavior } from "./actions/error";
 import { getErrors } from "./selectors/getErrors";
 import { isLoading } from "./selectors/isLoading";
@@ -21,6 +21,7 @@ export {
   addDefaultHeaderKey,
   api,
   apiReducer,
+  AppState,
   CallBehavior,
   clearDefaultHeaderKey,
   ClearErrorBehavior,
