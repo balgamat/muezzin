@@ -1,6 +1,6 @@
 {
   "name": "muezzin",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "The final, opinionated, solution to REST API calls based on `redux-saga`",
   "main": "dist/index.js",
   "scripts": {
