@@ -23,6 +23,7 @@ describe("Saga: handleCall", () => {
     }
   });
   const origin = "saga/test";
+  // @ts-ignore
   const gen = cloneableGenerator(handleCall)(action);
 
   it("should start loading", () => {

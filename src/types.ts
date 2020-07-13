@@ -4,9 +4,9 @@ import { ClearErrorsAC, ErrorAC } from "./actions/error";
 import { EndLoadingAC, StartLoadingAC } from "./actions/loading";
 import { AxiosRequestConfig } from "axios";
 
-export type Action<T, S = string> = {
-  type: S;
-  payload: T;
+export type Action<P, T = string> = {
+  type: T;
+  payload: P;
 };
 
 export type APIAction = ReturnType<
@@ -16,7 +16,7 @@ export type APIAction = ReturnType<
 export interface APIResult {
   response?: object;
   origin: string;
-  reducer?: (data: any, state?: any) => object;
+  reducer?: (data: any, state: State) => object;
 }
 
 export type APIState = Record<string, any> & {
@@ -27,10 +27,10 @@ export type APIState = Record<string, any> & {
 };
 
 export interface AppState {
-
+  [key: string]: any
 }
 
-export type State = AppState & APIState;
+export type State<S = AppState> = S & APIState;
 
 export interface BatchCall {
   requests: Action<APICall>[];
