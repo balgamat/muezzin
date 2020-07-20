@@ -1,13 +1,12 @@
 import { APIState } from "../types";
-import { allPass, always, has, ifElse, map, pathOr, pipe, props } from "ramda";
-import { notEmpty } from "../utils/notEmpty";
+import { pathOr, pipe, props, values } from "ramda";
 
 export interface ErrorsSelector {
-  (...origins: string[]): (state: APIState) => any[];
+  (...origins: string[]): (state: APIState) => APIState["errors"];
 }
 
 export const getErrors: ErrorsSelector = (...origins) =>
   pipe(
     pathOr({}, ["api", "errors"]),
-    props(origins),
+    !!origins.length ? props(origins) : values
   );
