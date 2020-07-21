@@ -100,7 +100,7 @@ export const withAPI = (rootReducer: Reducer) => (
           always({})
         )
       }
-    });
+    }, state);
   }
 
   return { ...rootReducer(state, action), api: state.api };
