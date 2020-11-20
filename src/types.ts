@@ -27,7 +27,7 @@ export type APIState = Record<string, any> & {
 };
 
 export interface AppState {
-  [key: string]: any
+  [key: string]: any;
 }
 
 export type State<S = AppState> = S & APIState;
@@ -58,5 +58,5 @@ export interface APICall {
     | ((state: State) => Array<PutEffect | CallEffect>)
     | Array<PutEffect | CallEffect>;
   reducer?: (data: any, state: State) => State;
-  url: string;
+  url: ((state: State) => string) | string;
 }
