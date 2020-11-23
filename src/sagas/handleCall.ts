@@ -18,7 +18,7 @@ export function* handleCall(action: Action<APICall>) {
       postActions,
       preActions,
       reducer,
-      url
+      url: propsUrl
     }
   } = action;
 
@@ -30,6 +30,9 @@ export function* handleCall(action: Action<APICall>) {
           : preActions
       );
     }
+
+    const url =
+      typeof propsUrl === "function" ? propsUrl(yield select()) : propsUrl;
 
     const { headers = defaultHeaders, method = "GET", ...req }: any =
       (typeof params === "function" ? params(yield select()) : params) || {};
