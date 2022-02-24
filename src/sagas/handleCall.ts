@@ -5,6 +5,7 @@ import { Success } from "../actions/success";
 import { handleError } from "./handleError";
 import { defaultHeaders } from "../headers";
 import { axios } from "../axios";
+import { clone } from "ramda";
 
 export function* handleCall(action: Action<APICall>) {
   const origin = action.payload.name;
@@ -46,7 +47,7 @@ export function* handleCall(action: Action<APICall>) {
       method,
       headers
     });
-    const response = { ...fetchedResponse };
+    const response = clone(fetchedResponse);
 
     yield all([
       put(
@@ -67,7 +68,11 @@ export function* handleCall(action: Action<APICall>) {
       );
     }
   } catch (e) {
-    const errorData = e.response || e.request || e.message;
+    const errorData = e.response
+      ? clone(e.response)
+      : e.request
+      ? clone(e.request)
+      : e.message;
 
     yield call(handleError, {
       errorData,
