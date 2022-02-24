@@ -34,14 +34,19 @@ export function* handleCall(action: Action<APICall>) {
     const url =
       typeof propsUrl === "function" ? propsUrl(yield select()) : propsUrl;
 
-    const { headers = defaultHeaders, method = "GET", ...req }: any =
-      (typeof params === "function" ? params(yield select()) : params) || {};
+    const {
+      headers = defaultHeaders,
+      method = "GET",
+      ...req
+    }: any = (typeof params === "function" ? params(yield select()) : params) ||
+    {};
 
-    const response = yield call(axios, url, {
+    const fetchedResponse = yield call(axios, url, {
       ...req,
       method,
       headers
     });
+    const response = { ...fetchedResponse };
 
     yield all([
       put(
